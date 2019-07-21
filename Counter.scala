@@ -13,13 +13,27 @@ object CounterApplication{
     def main(args: Array[String]): Unit = {
         println("Welcome to the Counter!")
         println(helpmsg)
-        println("----- Have fun counting -----")
+        println("---------- Have fun counting ----------")
         while(true){
             getInput()
         }
     }
 
-    val helpmsg: String = "The following are valid commands:\n"+ "exit     - Closes the application\n"+ "reset    - Resets the Counter\n"+ "c        - Increments the Counter by 1\n"+ "add x    - Increments the Counter by x \n"+ "counter  - Shows the value of the Counter\n"+ "help     - Shows this help message\n"
+    val helpmsg: String =
+    """The following are valid commands:
+    exit     - Closes the application
+    reset    - Resets the Counter
+    c        - Increments the Counter by 1
+    add x    - Increments the Counter by x
+    counter  - Shows the value of the Counter
+    help     - Shows this help message
+    gui      - Opens the GUI
+    guihelp  - Shows help message for the GUI"""
+
+    val guihelpmsg: String = 
+    """The following are valid input for the GUI:
+    Space       - Increments the Counter by 1
+    Backspace   - Decrements the Counter by 1"""
 
     def getInput(): Unit = {
         print("> ")
@@ -33,6 +47,7 @@ object CounterApplication{
             case "help" => println(helpmsg)
             case "counter" => println(counterStatus())
             case "gui" => Gui.openGUI()
+            case "guihelp" => println(guihelpmsg)
             case "add" => {
                 try{Counter.add(arguments.apply(1).toInt)}
                 catch {case e: Exception => println("Error: nothing added to counter")}
@@ -92,7 +107,8 @@ object Gui extends KeyListener{
 
     def keyPressed(x: KeyEvent): Unit = {x.getKeyCode() match {
             case KeyEvent.VK_SPACE => Counter.increment()
-            case _ => Counter.increment()
+            case KeyEvent.VK_BACK_SPACE => Counter.add(-1)
+            case _ => //nothing
         }
         updateGUI()
     }
@@ -104,6 +120,6 @@ object Gui extends KeyListener{
 object Counter{
     var count = 0
     def increment(): Unit = count += 1
-    def add(n: Int): Unit = count += n
+    def add(n: Int): Unit = for(k <-1 to n) {increment(); Gui.updateGUI; Thread.sleep(1000/n)}
     def reset(): Unit = count = 0
 }
